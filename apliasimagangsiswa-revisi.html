@@ -1,0 +1,2493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>InternTrack | Manajemen PKL</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --text: #172033;
+            --muted: #718096;
+            --border: #e5eaf2;
+            --sidebar: #111827;
+            --sidebar-text: #cbd5e1;
+            --success: #16a34a;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+        }
+
+        body.dark {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --border: #334155;
+            --sidebar: #020617;
+            --sidebar-text: #cbd5e1;
+            --shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        button,
+        input,
+        textarea,
+        select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 250px;
+            background: var(--sidebar);
+            color: white;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 12px 30px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .brand h2 {
+            font-size: 19px;
+        }
+
+        .brand p {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 3px;
+        }
+
+        .nav-title {
+            color: #64748b;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 12px;
+            margin: 12px 0;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .nav-btn {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--sidebar-text);
+            padding: 13px 14px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover,
+        .nav-btn.active {
+            background: #1e40af;
+            color: white;
+        }
+
+        .nav-btn span {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            border-top: 1px solid #334155;
+            padding-top: 18px;
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #dbeafe;
+            color: #1d4ed8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .sidebar-user strong {
+            display: block;
+            font-size: 13px;
+        }
+
+        .sidebar-user small {
+            color: #94a3b8;
+            font-size: 11px;
+        }
+
+        /* MAIN */
+
+        .main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .topbar {
+            height: 76px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text);
+        }
+
+        .page-title h1 {
+            font-size: 22px;
+        }
+
+        .page-title p {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            border-radius: 10px;
+            font-size: 17px;
+        }
+
+        .content {
+            padding: 30px;
+            max-width: 1500px;
+            margin: auto;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* DASHBOARD */
+
+        .welcome {
+            background: linear-gradient(120deg, #2563eb, #1e40af);
+            color: white;
+            border-radius: 18px;
+            padding: 28px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome::after {
+            content: "🎯";
+            position: absolute;
+            right: 35px;
+            bottom: -15px;
+            font-size: 100px;
+            opacity: 0.12;
+        }
+
+        .welcome h2 {
+            font-size: 23px;
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            color: #dbeafe;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .stat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .blue { background: #dbeafe; }
+        .green { background: #dcfce7; }
+        .orange { background: #ffedd5; }
+        .purple { background: #ede9fe; }
+
+        .stat-card small {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .stat-card h2 {
+            font-size: 28px;
+            margin-top: 7px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 22px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card-header h3 {
+            font-size: 17px;
+        }
+
+        .text-btn {
+            border: none;
+            background: none;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* PROGRESS */
+
+        .progress-box {
+            margin-bottom: 25px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .progress-info span:last-child {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: inherit;
+            transition: width 0.3s;
+        }
+
+        /* TASK */
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .task-info {
+            min-width: 0;
+        }
+
+        .task-info h4 {
+            font-size: 14px;
+            margin-bottom: 7px;
+            word-break: break-word;
+        }
+
+        .task-info p {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .task-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .badge.blue-bg {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .badge.green-bg {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge.orange-bg {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+
+        .badge.red-bg {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 7px;
+            flex-shrink: 0;
+        }
+
+        .small-btn {
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .small-btn:hover {
+            background: var(--bg);
+        }
+
+        /* JOURNAL */
+
+        .journal-item {
+            border-left: 3px solid var(--primary);
+            padding: 0 0 18px 18px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .journal-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .journal-item::before {
+            content: "";
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 13px;
+            height: 13px;
+            background: var(--primary);
+            border-radius: 50%;
+            border: 3px solid var(--card);
+        }
+
+        .journal-date {
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .journal-item h4 {
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .journal-item p {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* PAGE HEADER */
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .section-header h2 {
+            font-size: 22px;
+        }
+
+        .section-header p {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .primary-btn {
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 12px 17px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .primary-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .secondary-btn {
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            padding: 12px 17px;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box input,
+        .filter-bar select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--card);
+            color: var(--text);
+            outline: none;
+        }
+
+        .filter-bar select {
+            width: 180px;
+        }
+
+        .search-box input:focus,
+        .filter-bar select:focus,
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+        }
+
+        /* TABLE */
+
+        .table-card {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th,
+        td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        th {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            color: var(--text);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* PROFILE */
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 22px;
+        }
+
+        .profile-card {
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #dbeafe;
+            color: #1d4ed8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            font-weight: bold;
+            margin: 0 auto 15px;
+        }
+
+        .profile-card h2 {
+            font-size: 20px;
+        }
+
+        .profile-card p {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .profile-info {
+            text-align: left;
+            margin-top: 25px;
+        }
+
+        .profile-info div {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .profile-info div:last-child {
+            border-bottom: none;
+        }
+
+        .profile-info strong {
+            display: inline-block;
+            width: 100px;
+            color: var(--muted);
+            font-weight: normal;
+        }
+
+        /* EMPTY */
+
+        .empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--muted);
+        }
+
+        .empty-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .empty p {
+            font-size: 13px;
+        }
+
+        /* MODAL */
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--card);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 16px;
+            padding: 25px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+        }
+
+        .close-modal {
+            border: none;
+            background: none;
+            color: var(--muted);
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--card);
+            color: var(--text);
+            outline: none;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        /* TOAST */
+
+        .toast {
+            position: fixed;
+            right: 25px;
+            bottom: 25px;
+            background: #172033;
+            color: white;
+            padding: 14px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: 0.3s;
+            z-index: 200;
+            max-width: 300px;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1100px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -260px;
+                top: 0;
+                bottom: 0;
+                z-index: 90;
+                transition: 0.3s;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .topbar {
+                padding: 0 18px;
+                height: 70px;
+            }
+
+            .page-title h1 {
+                font-size: 18px;
+            }
+
+            .page-title p {
+                display: none;
+            }
+
+            .content {
+                padding: 20px 15px;
+            }
+
+            .welcome {
+                padding: 22px;
+            }
+
+            .welcome h2 {
+                font-size: 19px;
+            }
+
+            .stats-grid {
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .stat-card h2 {
+                font-size: 23px;
+            }
+
+            .stat-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+
+            .section-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .section-header .primary-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .task-item {
+                align-items: flex-start;
+            }
+
+            .task-actions {
+                flex-direction: column;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+            }
+
+            .filter-bar select {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .stat-card small {
+                font-size: 11px;
+            }
+
+            .stat-card h2 {
+                font-size: 21px;
+            }
+
+            .card {
+                padding: 17px;
+            }
+
+            .task-item {
+                flex-direction: column;
+            }
+
+            .task-actions {
+                flex-direction: row;
+                width: 100%;
+            }
+
+            .task-actions button {
+                flex: 1;
+            }
+
+            .top-actions .icon-btn:first-child {
+                display: none;
+            }
+
+            .profile-info strong {
+                width: 85px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">🎯</div>
+            <div>
+                <h2>InternTrack</h2>
+                <p>Manajemen PKL</p>
+            </div>
+        </div>
+
+        <div class="nav-title">Menu Utama</div>
+
+        <nav class="nav-menu">
+
+            <button class="nav-btn active" data-page="dashboard">
+                <span>📊</span>
+                Dashboard
+            </button>
+
+            <button class="nav-btn" data-page="tasks">
+                <span>📋</span>
+                Tugas PKL
+            </button>
+
+            <button class="nav-btn" data-page="attendance"><span>📸</span> Absensi</button>
+
+            <button class="nav-btn" data-page="journal">
+                <span>📝</span>
+                Jurnal Kegiatan
+            </button>
+
+            <button class="nav-btn" data-page="assessment">
+                <span>⭐</span>
+                Penilaian
+            </button>
+
+            <button class="nav-btn" data-page="profile">
+                <span>👤</span>
+                Profil Saya
+            </button>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-user">
+                <div class="avatar" id="sidebarAvatar">A</div>
+                <div>
+                    <strong id="sidebarName">Atar</strong>
+                    <small>Siswa PKL</small>
+                </div>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <header class="topbar">
+
+            <div style="display:flex;align-items:center;gap:15px;">
+                <button class="menu-toggle" id="menuToggle">☰</button>
+
+                <div class="page-title">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <p id="pageSubtitle">Kelola kegiatan PKL kamu dengan mudah.</p>
+                </div>
+            </div>
+
+            <div class="top-actions">
+                <button class="icon-btn" id="themeToggle" title="Mode gelap">🌙</button>
+                <button class="icon-btn" onclick="showToast('Notifikasi belum tersedia')">🔔</button>
+            </div>
+
+        </header>
+
+        <div class="content">
+
+            <!-- DASHBOARD -->
+            <section class="page active" id="dashboard">
+
+                <div class="welcome">
+                    <h2>Selamat datang, <span id="welcomeName">Atar</span>! 👋</h2>
+                    <p>Semangat menjalani kegiatan PKL hari ini.</p>
+                </div>
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <small>Total Tugas</small>
+                            <div class="stat-icon blue">📋</div>
+                        </div>
+                        <h2 id="totalTasks">0</h2>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <small>Tugas Selesai</small>
+                            <div class="stat-icon green">✅</div>
+                        </div>
+                        <h2 id="completedTasks">0</h2>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <small>Belum Selesai</small>
+                            <div class="stat-icon orange">⏳</div>
+                        </div>
+                        <h2 id="pendingTasks">0</h2>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <small>Nilai Absensi</small>
+                            <div class="stat-icon green">📸</div>
+                        </div>
+                        <h2 id="attendanceScore">0</h2>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <small>Progress PKL</small>
+                            <div class="stat-icon purple">📈</div>
+                        </div>
+                        <h2 id="progressPercent">0%</h2>
+                    </div>
+
+                </div>
+
+                <div class="dashboard-grid">
+
+                    <div class="card">
+
+                        <div class="card-header">
+                            <h3>📋 Tugas Terbaru</h3>
+                            <button class="text-btn" onclick="showPage('tasks')">Lihat Semua</button>
+                        </div>
+
+                        <div class="task-list" id="dashboardTasks"></div>
+
+                    </div>
+
+                    <div class="card">
+
+                        <div class="card-header">
+                            <h3>📊 Progress PKL</h3>
+                        </div>
+
+                        <div class="progress-box">
+                            <div class="progress-info">
+                                <span>Target penyelesaian tugas</span>
+                                <span id="progressText">0%</span>
+                            </div>
+
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill" style="width:0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="card-header">
+                            <h3>📝 Jurnal Terbaru</h3>
+                            <button class="text-btn" onclick="showPage('journal')">Lihat Semua</button>
+                        </div>
+
+                        <div id="dashboardJournal"></div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- TASKS -->
+            <section class="page" id="tasks">
+
+                <div class="section-header">
+                    <div>
+                        <h2>Tugas PKL</h2>
+                        <p>Kelola semua tugas dan deadline kamu.</p>
+                    </div>
+
+                    <button class="primary-btn" onclick="openTaskModal()">
+                        ＋ Tambah Tugas
+                    </button>
+                </div>
+
+                <div class="filter-bar">
+
+                    <div class="search-box">
+                        <input type="text" id="taskSearch" placeholder="🔍 Cari tugas...">
+                    </div>
+
+                    <select id="taskFilter">
+                        <option value="all">Semua Status</option>
+                        <option value="Belum Dikerjakan">Belum Dikerjakan</option>
+                        <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
+                        <option value="Selesai">Selesai</option>
+                    </select>
+
+                </div>
+
+                <div class="card table-card">
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama Tugas</th>
+                                <th>Deadline</th>
+                                <th>Prioritas</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="taskTable"></tbody>
+                    </table>
+
+                </div>
+
+            </section>
+
+            <!-- ATTENDANCE -->
+<section class="page" id="attendance">
+<div class="section-header"><div><h2>Absensi Siswa</h2><p>Ambil foto kehadiran, waktu dan lokasi tercatat otomatis.</p></div>
+<button class="primary-btn" onclick="openAttendanceModal()">📸 Absen Sekarang</button></div>
+<div class="stats-grid">
+<div class="stat-card"><small>Hadir</small><h2 id="attPresent">0</h2></div>
+<div class="stat-card"><small>Izin</small><h2 id="attPermit">0</h2></div>
+<div class="stat-card"><small>Sakit</small><h2 id="attSick">0</h2></div>
+<div class="stat-card"><small>Tanpa Keterangan</small><h2 id="attAbsent">0</h2></div>
+</div>
+<div class="card"><div class="card-header"><h3>Riwayat Absensi</h3>
+<label style="font-size:12px;color:var(--muted)">Hari kerja/bulan <input id="workingDays" type="number" min="1" max="31" value="20" style="width:70px;padding:6px;border:1px solid var(--border);border-radius:6px"></label></div>
+<div class="table-card"><table><thead><tr><th>Tanggal</th><th>Waktu</th><th>Status</th><th>Lokasi</th><th>Foto</th><th>Aksi</th></tr></thead><tbody id="attendanceTable"></tbody></table></div></div>
+</section>
+
+<!-- JOURNAL -->
+            <section class="page" id="journal">
+
+                <div class="section-header">
+                    <div>
+                        <h2>Jurnal Kegiatan</h2>
+                        <p>Catat kegiatan PKL kamu setiap hari.</p>
+                    </div>
+
+                    <button class="primary-btn" onclick="openJournalModal()">
+                        ＋ Tambah Jurnal
+                    </button>
+                </div>
+
+                <div class="card">
+
+                    <div class="task-list" id="journalList"></div>
+
+                </div>
+
+            </section>
+
+            <!-- ASSESSMENT -->
+            <section class="page" id="assessment">
+
+                <div class="section-header">
+                    <div>
+                        <h2>Penilaian PKL</h2>
+                        <p>Catatan dan penilaian dari pembimbing.</p>
+                    </div>
+                </div>
+
+                <div class="profile-grid">
+
+                    <div class="card profile-card">
+
+                        <div class="profile-avatar" id="assessmentAvatar">A</div>
+
+                        <h2 id="assessmentName">Atar</h2>
+                        <p id="assessmentMajor">Siswa PKL</p>
+
+                        <div class="profile-info">
+                            <div>
+                                <strong>Status</strong>
+                                <span>Aktif</span>
+                            </div>
+
+                            <div>
+                                <strong>Progress</strong>
+                                <span id="assessmentProgress">0%</span>
+                            </div>
+
+                            <div>
+                                <strong>Nilai</strong>
+                                <span id="assessmentScore">Belum dinilai</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="card">
+
+                        <div class="card-header">
+                            <h3>⭐ Penilaian Pembimbing</h3>
+                            <button class="primary-btn" onclick="openAssessmentModal()">Edit Nilai</button>
+                        </div>
+
+                        <div class="profile-info">
+
+                            <div>
+                                <strong>Nilai Absensi</strong>
+                                <span id="scoreDiscipline">-</span>
+                            </div>
+
+                            <div>
+                                <strong>Nilai Tugas</strong>
+                                <span id="scoreTeamwork">-</span>
+                            </div>
+
+                            <div>
+                                <strong>Nilai Keseluruhan</strong>
+                                <span id="scoreResponsibility">-</span>
+                            </div>
+
+                            <div>
+                                <strong>Catatan</strong>
+                                <span id="scoreNote">Belum ada catatan.</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- PROFILE -->
+            <section class="page" id="profile">
+
+                <div class="section-header">
+                    <div>
+                        <h2>Profil Saya</h2>
+                        <p>Kelola informasi pribadi kamu.</p>
+                    </div>
+                </div>
+
+                <div class="profile-grid">
+
+                    <div class="card profile-card">
+
+                        <div class="profile-avatar" id="profileAvatar">A</div>
+
+                        <h2 id="profileName">Atar</h2>
+                        <p id="profileMajor">Siswa PKL</p>
+
+                        <button class="secondary-btn" style="margin-top:20px;" onclick="openProfileModal()">
+                            ✏️ Edit Profil
+                        </button>
+
+                    </div>
+
+                    <div class="card">
+
+                        <div class="card-header">
+                            <h3>Informasi Siswa</h3>
+                        </div>
+
+                        <div class="profile-info">
+
+                            <div>
+                                <strong>Nama</strong>
+                                <span id="infoName">Atar</span>
+                            </div>
+
+                            <div>
+                                <strong>NISN / NIS</strong>
+                                <span id="infoNis">-</span>
+                            </div>
+
+                            <div>
+                                <strong>Jurusan</strong>
+                                <span id="infoMajor">-</span>
+                            </div>
+
+                            <div>
+                                <strong>Tempat PKL</strong>
+                                <span id="infoCompany">-</span>
+                            </div>
+
+                            <div>
+                                <strong>Pembimbing</strong>
+                                <span id="infoSupervisor">-</span>
+                            </div>
+
+                            <div>
+                                <strong>Periode</strong>
+                                <span id="infoPeriod">-</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- MODAL TUGAS -->
+<div class="modal" id="taskModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h3 id="taskModalTitle">Tambah Tugas</h3>
+            <button class="close-modal" onclick="closeModal('taskModal')">×</button>
+        </div>
+
+        <form id="taskForm">
+
+            <input type="hidden" id="taskId">
+
+            <div class="form-group">
+                <label>Nama Tugas</label>
+                <input type="text" id="taskTitle" placeholder="Contoh: Membuat laporan PKL" required>
+            </div>
+
+            <div class="form-group">
+                <label>Deskripsi</label>
+                <textarea id="taskDescription" placeholder="Jelaskan tugas yang harus dikerjakan..."></textarea>
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label>Deadline</label>
+                    <input type="date" id="taskDeadline" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Prioritas</label>
+                    <select id="taskPriority">
+                        <option value="Rendah">Rendah</option>
+                        <option value="Sedang" selected>Sedang</option>
+                        <option value="Tinggi">Tinggi</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <label>Status</label>
+                <select id="taskStatus">
+                    <option value="Belum Dikerjakan">Belum Dikerjakan</option>
+                    <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
+                    <option value="Selesai">Selesai</option>
+                </select>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="secondary-btn" onclick="closeModal('taskModal')">Batal</button>
+                <button type="submit" class="primary-btn">Simpan Tugas</button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- MODAL JURNAL -->
+<div class="modal" id="journalModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h3>Tambah Jurnal Kegiatan</h3>
+            <button class="close-modal" onclick="closeModal('journalModal')">×</button>
+        </div>
+
+        <form id="journalForm">
+
+            <div class="form-group">
+                <label>Tanggal</label>
+                <input type="date" id="journalDate" required>
+            </div>
+
+            <div class="form-group">
+                <label>Judul Kegiatan</label>
+                <input type="text" id="journalTitle" placeholder="Contoh: Membuat desain poster" required>
+            </div>
+
+            <div class="form-group">
+                <label>Deskripsi Kegiatan</label>
+                <textarea id="journalDescription" placeholder="Ceritakan kegiatan yang dilakukan..." required></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="secondary-btn" onclick="closeModal('journalModal')">Batal</button>
+                <button type="submit" class="primary-btn">Simpan Jurnal</button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- MODAL PROFIL -->
+<div class="modal" id="profileModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h3>Edit Profil</h3>
+            <button class="close-modal" onclick="closeModal('profileModal')">×</button>
+        </div>
+
+        <form id="profileForm">
+
+            <div class="form-group">
+                <label>Nama Lengkap</label>
+                <input type="text" id="profileNameInput" required>
+            </div>
+
+            <div class="form-group">
+                <label>NISN / NIS</label>
+                <input type="text" id="profileNisInput">
+            </div>
+
+            <div class="form-group">
+                <label>Jurusan</label>
+                <input type="text" id="profileMajorInput" placeholder="Contoh: Rekayasa Perangkat Lunak">
+            </div>
+
+            <div class="form-group">
+                <label>Tempat PKL</label>
+                <input type="text" id="profileCompanyInput" placeholder="Nama perusahaan">
+            </div>
+
+            <div class="form-group">
+                <label>Pembimbing</label>
+                <input type="text" id="profileSupervisorInput">
+            </div>
+
+            <div class="form-group">
+                <label>Periode PKL</label>
+                <input type="text" id="profilePeriodInput" placeholder="Contoh: Juli - September 2026">
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="secondary-btn" onclick="closeModal('profileModal')">Batal</button>
+                <button type="submit" class="primary-btn">Simpan Profil</button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- MODAL PENILAIAN -->
+<div class="modal" id="assessmentModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h3>Edit Penilaian</h3>
+            <button class="close-modal" onclick="closeModal('assessmentModal')">×</button>
+        </div>
+
+        <form id="assessmentForm">
+
+            <div class="form-group">
+                <label>Nilai Disiplin</label>
+                <input type="number" id="disciplineInput" min="0" max="100" placeholder="0 - 100">
+            </div>
+
+            <div class="form-group">
+                <label>Nilai Kerja Sama</label>
+                <input type="number" id="teamworkInput" min="0" max="100" placeholder="0 - 100">
+            </div>
+
+            <div class="form-group">
+                <label>Nilai Tanggung Jawab</label>
+                <input type="number" id="responsibilityInput" min="0" max="100" placeholder="0 - 100">
+            </div>
+
+            <div class="form-group">
+                <label>Catatan Pembimbing</label>
+                <textarea id="noteInput" placeholder="Catatan atau evaluasi..."></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="secondary-btn" onclick="closeModal('assessmentModal')">Batal</button>
+                <button type="submit" class="primary-btn">Simpan Penilaian</button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<div class="modal" id="attendanceModal"><div class="modal-box"><div class="modal-header"><h3>Absensi Kamera</h3><button class="close-modal" onclick="closeAttendanceModal()">×</button></div>
+<video id="attendanceVideo" autoplay playsinline style="width:100%;border-radius:12px;background:#000"></video><canvas id="attendanceCanvas" hidden></canvas>
+<div id="attendancePreview"></div><p id="locationStatus" style="font-size:12px;color:var(--muted);margin:10px 0">Lokasi belum diambil.</p>
+<div class="form-group"><label>Status</label><select id="attendanceStatus"><option value="Hadir">Hadir</option><option value="Izin">Izin</option><option value="Sakit">Sakit</option><option value="Tanpa Keterangan">Tanpa Keterangan</option></select></div>
+<div class="form-group"><label>Catatan</label><textarea id="attendanceNote" placeholder="Catatan opsional"></textarea></div>
+<div class="modal-footer"><button class="secondary-btn" onclick="captureAttendancePhoto()">📷 Ambil Foto</button><button class="primary-btn" onclick="saveAttendance()">Simpan Absensi</button></div></div></div><div class="toast" id="toast"></div>
+
+<script>
+    // ==========================================
+    // DATA
+    // ==========================================
+
+    let tasks = JSON.parse(localStorage.getItem("interntrack_tasks")) || [];
+
+    let journals = JSON.parse(localStorage.getItem("interntrack_journals")) || [];
+
+    let profile = JSON.parse(localStorage.getItem("interntrack_profile")) || {
+        name: "Atar",
+        nis: "",
+        major: "Siswa PKL",
+        company: "",
+        supervisor: "",
+        period: ""
+    };
+
+    let assessment = JSON.parse(localStorage.getItem("interntrack_assessment")) || {
+        discipline: "",
+        teamwork: "",
+        responsibility: "",
+        note: ""
+    };
+
+    let editingTaskId = null;
+
+    // ==========================================
+    // ELEMENTS
+    // ==========================================
+
+    const navButtons = document.querySelectorAll(".nav-btn");
+
+    const pages = document.querySelectorAll(".page");
+
+    const pageTitle = document.getElementById("pageTitle");
+
+    const pageSubtitle = document.getElementById("pageSubtitle");
+
+    const sidebar = document.getElementById("sidebar");
+
+    const menuToggle = document.getElementById("menuToggle");
+
+    // ==========================================
+    // NAVIGATION
+    // ==========================================
+
+    const pageInfo = {
+        dashboard: {
+            title: "Dashboard",
+            subtitle: "Kelola kegiatan PKL kamu dengan mudah."
+        },
+        tasks: {
+            title: "Tugas PKL",
+            subtitle: "Kelola semua tugas dan deadline kamu."
+        },
+        journal: {
+            title: "Jurnal Kegiatan",
+            subtitle: "Catat kegiatan PKL kamu setiap hari."
+        },
+        assessment: {
+            title: "Penilaian PKL",
+            subtitle: "Catatan dan penilaian dari pembimbing."
+        },
+        profile: {
+            title: "Profil Saya",
+            subtitle: "Kelola informasi pribadi kamu."
+        }
+    };
+
+    function showPage(pageId) {
+
+        pages.forEach(page => {
+            page.classList.remove("active");
+        });
+
+        navButtons.forEach(button => {
+            button.classList.remove("active");
+        });
+
+        document.getElementById(pageId).classList.add("active");
+
+        const activeButton = document.querySelector(`[data-page="${pageId}"]`);
+
+        if (activeButton) {
+            activeButton.classList.add("active");
+        }
+
+        pageTitle.textContent = pageInfo[pageId].title;
+
+        pageSubtitle.textContent = pageInfo[pageId].subtitle;
+
+        sidebar.classList.remove("open");
+
+        if (pageId === "dashboard") {
+            renderDashboard();
+        }
+
+        if (pageId === "tasks") {
+            renderTasks();
+        }
+
+        if (pageId === "journal") {
+            renderJournals();
+        }
+
+        if (pageId === "assessment") {
+            renderAssessment();
+        }
+
+        if (pageId === "profile") {
+            renderProfile();
+        }
+
+    }
+
+    navButtons.forEach(button => {
+
+        button.addEventListener("click", () => {
+            showPage(button.dataset.page);
+        });
+
+    });
+
+    menuToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+    });
+
+    // ==========================================
+    // LOCAL STORAGE
+    // ==========================================
+
+    function saveData() {
+
+        localStorage.setItem(
+            "interntrack_tasks",
+            JSON.stringify(tasks)
+        );
+
+        localStorage.setItem(
+            "interntrack_journals",
+            JSON.stringify(journals)
+        );
+
+        localStorage.setItem(
+            "interntrack_profile",
+            JSON.stringify(profile)
+        );
+
+        localStorage.setItem(
+            "interntrack_assessment",
+            JSON.stringify(assessment)
+        );
+
+    }
+
+    // ==========================================
+    // DASHBOARD
+    // ==========================================
+
+    function renderDashboard() {
+
+        const total = tasks.length;
+
+        const completed = tasks.filter(
+            task => task.status === "Selesai"
+        ).length;
+
+        const pending = total - completed;
+
+        const progress = total === 0
+            ? 0
+            : Math.round((completed / total) * 100);
+
+        document.getElementById("totalTasks").textContent = total;
+
+        document.getElementById("completedTasks").textContent = completed;
+
+        document.getElementById("pendingTasks").textContent = pending;
+
+        document.getElementById("progressPercent").textContent = progress + "%";
+
+        document.getElementById("progressText").textContent = progress + "%";
+
+        document.getElementById("progressFill").style.width = progress + "%";
+
+        document.getElementById("welcomeName").textContent = profile.name;
+
+        const dashboardTasks = document.getElementById("dashboardTasks");
+
+        const latestTasks = [...tasks].reverse().slice(0, 4);
+
+        if (latestTasks.length === 0) {
+
+            dashboardTasks.innerHTML = `
+                <div class="empty">
+                    <div class="empty-icon">📋</div>
+                    <p>Belum ada tugas. Yuk, tambahkan tugas pertama kamu!</p>
+                </div>
+            `;
+
+        } else {
+
+            dashboardTasks.innerHTML = latestTasks.map(task => {
+
+                return `
+                    <div class="task-item">
+
+                        <div class="task-info">
+                            <h4>${escapeHTML(task.title)}</h4>
+                            <p>📅 ${formatDate(task.deadline)}</p>
+
+                            <div class="task-meta">
+                                ${getStatusBadge(task.status)}
+                                ${getPriorityBadge(task.priority)}
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+
+            }).join("");
+
+        }
+
+        const dashboardJournal = document.getElementById("dashboardJournal");
+
+        const latestJournals = [...journals].reverse().slice(0, 3);
+
+        if (latestJournals.length === 0) {
+
+            dashboardJournal.innerHTML = `
+                <div class="empty">
+                    <div class="empty-icon">📝</div>
+                    <p>Belum ada jurnal kegiatan.</p>
+                </div>
+            `;
+
+        } else {
+
+            dashboardJournal.innerHTML = latestJournals.map(journal => {
+
+                return `
+                    <div class="journal-item">
+
+                        <div class="journal-date">
+                            ${formatDate(journal.date)}
+                        </div>
+
+                        <h4>${escapeHTML(journal.title)}</h4>
+
+                        <p>${escapeHTML(journal.description)}</p>
+
+                    </div>
+                `;
+
+            }).join("");
+
+        }
+
+    }
+
+    // ==========================================
+    // TASKS
+    // ==========================================
+
+    function openTaskModal(taskId = null) {
+
+        editingTaskId = taskId;
+
+        document.getElementById("taskModal").classList.add("active");
+
+        if (taskId) {
+
+            const task = tasks.find(item => item.id === taskId);
+
+            document.getElementById("taskModalTitle").textContent = "Edit Tugas";
+
+            document.getElementById("taskId").value = task.id;
+
+            document.getElementById("taskTitle").value = task.title;
+
+            document.getElementById("taskDescription").value = task.description;
+
+            document.getElementById("taskDeadline").value = task.deadline;
+
+            document.getElementById("taskPriority").value = task.priority;
+
+            document.getElementById("taskStatus").value = task.status;
+
+        } else {
+
+            document.getElementById("taskModalTitle").textContent = "Tambah Tugas";
+
+            document.getElementById("taskForm").reset();
+
+            document.getElementById("taskId").value = "";
+
+        }
+
+    }
+
+    document.getElementById("taskForm").addEventListener("submit", function(e) {
+
+        e.preventDefault();
+
+        const title = document.getElementById("taskTitle").value.trim();
+
+        const description = document.getElementById("taskDescription").value.trim();
+
+        const deadline = document.getElementById("taskDeadline").value;
+
+        const priority = document.getElementById("taskPriority").value;
+
+        const status = document.getElementById("taskStatus").value;
+
+        if (editingTaskId) {
+
+            const task = tasks.find(item => item.id === editingTaskId);
+
+            task.title = title;
+
+            task.description = description;
+
+            task.deadline = deadline;
+
+            task.priority = priority;
+
+            task.status = status;
+
+            showToast("Tugas berhasil diperbarui!");
+
+        } else {
+
+            tasks.push({
+
+                id: Date.now(),
+
+                title,
+
+                description,
+
+                deadline,
+
+                priority,
+
+                status
+
+            });
+
+            showToast("Tugas berhasil ditambahkan!");
+
+        }
+
+        saveData();
+
+        closeModal("taskModal");
+
+        renderTasks();
+
+        renderDashboard();
+
+    });
+
+    function renderTasks() {
+
+        const tbody = document.getElementById("taskTable");
+
+        const search = document.getElementById("taskSearch").value.toLowerCase();
+
+        const filter = document.getElementById("taskFilter").value;
+
+        const filteredTasks = tasks.filter(task => {
+
+            const matchSearch = task.title.toLowerCase().includes(search);
+
+            const matchFilter = filter === "all" || task.status === filter;
+
+            return matchSearch && matchFilter;
+
+        });
+
+        if (filteredTasks.length === 0) {
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        <div class="empty">
+                            <div class="empty-icon">📋</div>
+                            <p>Belum ada tugas yang sesuai.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+        tbody.innerHTML = filteredTasks.map(task => {
+
+            return `
+                <tr>
+
+                    <td>
+                        <strong>${escapeHTML(task.title)}</strong>
+                        <div style="color:var(--muted);font-size:11px;margin-top:5px;">
+                            ${escapeHTML(task.description || "Tidak ada deskripsi")}
+                        </div>
+                    </td>
+
+                    <td>${formatDate(task.deadline)}</td>
+
+                    <td>${getPriorityBadge(task.priority)}</td>
+
+                    <td>${getStatusBadge(task.status)}</td>
+
+                    <td>
+                        <div class="task-actions">
+                            <button class="small-btn" onclick="openTaskModal(${task.id})" title="Edit">✏️</button>
+                            <button class="small-btn" onclick="deleteTask(${task.id})" title="Hapus">🗑️</button>
+                        </div>
+                    </td>
+
+                </tr>
+            `;
+
+        }).join("");
+
+    }
+
+    function deleteTask(id) {
+
+        if (!confirm("Yakin ingin menghapus tugas ini?")) {
+            return;
+        }
+
+        tasks = tasks.filter(task => task.id !== id);
+
+        saveData();
+
+        renderTasks();
+
+        renderDashboard();
+
+        showToast("Tugas berhasil dihapus!");
+
+    }
+
+    document.getElementById("taskSearch").addEventListener("input", renderTasks);
+
+    document.getElementById("taskFilter").addEventListener("change", renderTasks);
+
+    // ==========================================
+    // JOURNAL
+    // ==========================================
+
+    function openJournalModal() {
+
+        document.getElementById("journalModal").classList.add("active");
+
+        document.getElementById("journalForm").reset();
+
+        document.getElementById("journalDate").value = new Date().toISOString().split("T")[0];
+
+    }
+
+    document.getElementById("journalForm").addEventListener("submit", function(e) {
+
+        e.preventDefault();
+
+        journals.push({
+
+            id: Date.now(),
+
+            date: document.getElementById("journalDate").value,
+
+            title: document.getElementById("journalTitle").value.trim(),
+
+            description: document.getElementById("journalDescription").value.trim()
+
+        });
+
+        saveData();
+
+        closeModal("journalModal");
+
+        renderJournals();
+
+        renderDashboard();
+
+        showToast("Jurnal berhasil ditambahkan!");
+
+    });
+
+    function renderJournals() {
+
+        const container = document.getElementById("journalList");
+
+        const sortedJournals = [...journals].sort(
+            (a, b) => new Date(b.date) - new Date(a.date)
+        );
+
+        if (sortedJournals.length === 0) {
+
+            container.innerHTML = `
+                <div class="empty">
+                    <div class="empty-icon">📝</div>
+                    <p>Belum ada jurnal kegiatan.</p>
+                </div>
+            `;
+
+            return;
+
+        }
+
+        container.innerHTML = sortedJournals.map(journal => {
+
+            return `
+                <div class="journal-item">
+
+                    <div class="journal-date">
+                        ${formatDate(journal.date)}
+                    </div>
+
+                    <h4>${escapeHTML(journal.title)}</h4>
+
+                    <p>${escapeHTML(journal.description)}</p>
+
+                    <button class="small-btn" style="margin-top:10px;" onclick="deleteJournal(${journal.id})" title="Hapus">
+                        🗑️
+                    </button>
+
+                </div>
+            `;
+
+        }).join("");
+
+    }
+
+    function deleteJournal(id) {
+
+        if (!confirm("Yakin ingin menghapus jurnal ini?")) {
+            return;
+        }
+
+        journals = journals.filter(journal => journal.id !== id);
+
+        saveData();
+
+        renderJournals();
+
+        renderDashboard();
+
+        showToast("Jurnal berhasil dihapus!");
+
+    }
+
+    // ==========================================
+    // PROFILE
+    // ==========================================
+
+    function openProfileModal() {
+
+        document.getElementById("profileModal").classList.add("active");
+
+        document.getElementById("profileNameInput").value = profile.name;
+
+        document.getElementById("profileNisInput").value = profile.nis;
+
+        document.getElementById("profileMajorInput").value = profile.major;
+
+        document.getElementById("profileCompanyInput").value = profile.company;
+
+        document.getElementById("profileSupervisorInput").value = profile.supervisor;
+
+        document.getElementById("profilePeriodInput").value = profile.period;
+
+    }
+
+    document.getElementById("profileForm").addEventListener("submit", function(e) {
+
+        e.preventDefault();
+
+        profile = {
+
+            name: document.getElementById("profileNameInput").value.trim() || "Siswa",
+
+            nis: document.getElementById("profileNisInput").value.trim(),
+
+            major: document.getElementById("profileMajorInput").value.trim() || "Siswa PKL",
+
+            company: document.getElementById("profileCompanyInput").value.trim(),
+
+            supervisor: document.getElementById("profileSupervisorInput").value.trim(),
+
+            period: document.getElementById("profilePeriodInput").value.trim()
+
+        };
+
+        saveData();
+
+        closeModal("profileModal");
+
+        renderProfile();
+
+        renderDashboard();
+
+        showToast("Profil berhasil diperbarui!");
+
+    });
+
+    function renderProfile() {
+
+        const name = profile.name || "Siswa";
+
+        const initial = name.charAt(0).toUpperCase();
+
+        document.getElementById("profileName").textContent = name;
+
+        document.getElementById("profileMajor").textContent = profile.major;
+
+        document.getElementById("profileAvatar").textContent = initial;
+
+        document.getElementById("infoName").textContent = name;
+
+        document.getElementById("infoNis").textContent = profile.nis || "-";
+
+        document.getElementById("infoMajor").textContent = profile.major || "-";
+
+        document.getElementById("infoCompany").textContent = profile.company || "-";
+
+        document.getElementById("infoSupervisor").textContent = profile.supervisor || "-";
+
+        document.getElementById("infoPeriod").textContent = profile.period || "-";
+
+        document.getElementById("sidebarName").textContent = name;
+
+        document.getElementById("sidebarAvatar").textContent = initial;
+
+        document.getElementById("welcomeName").textContent = name;
+
+    }
+
+    // ==========================================
+    // ASSESSMENT
+    // ==========================================
+
+    function openAssessmentModal() {
+
+        document.getElementById("assessmentModal").classList.add("active");
+
+        document.getElementById("disciplineInput").value = assessment.discipline;
+
+        document.getElementById("teamworkInput").value = assessment.teamwork;
+
+        document.getElementById("responsibilityInput").value = assessment.responsibility;
+
+        document.getElementById("noteInput").value = assessment.note;
+
+    }
+
+    document.getElementById("assessmentForm").addEventListener("submit", function(e) {
+
+        e.preventDefault();
+
+        assessment = {
+
+            discipline: document.getElementById("disciplineInput").value,
+
+            teamwork: document.getElementById("teamworkInput").value,
+
+            responsibility: document.getElementById("responsibilityInput").value,
+
+            note: document.getElementById("noteInput").value.trim()
+
+        };
+
+        saveData();
+
+        closeModal("assessmentModal");
+
+        renderAssessment();
+
+        showToast("Penilaian berhasil disimpan!");
+
+    });
+
+    function renderAssessment() {
+
+        document.getElementById("assessmentName").textContent = profile.name;
+
+        document.getElementById("assessmentMajor").textContent = profile.major;
+
+        document.getElementById("assessmentAvatar").textContent = profile.name.charAt(0).toUpperCase();
+
+        const total = tasks.length;
+
+        const completed = tasks.filter(task => task.status === "Selesai").length;
+
+        const progress = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+        document.getElementById("assessmentProgress").textContent = progress + "%";
+
+        document.getElementById("scoreDiscipline").textContent = assessment.discipline || "-";
+
+        document.getElementById("scoreTeamwork").textContent = assessment.teamwork || "-";
+
+        document.getElementById("scoreResponsibility").textContent = assessment.responsibility || "-";
+
+        document.getElementById("scoreNote").textContent = assessment.note || "Belum ada catatan.";
+
+        const scores = [
+
+            Number(assessment.discipline),
+
+            Number(assessment.teamwork),
+
+            Number(assessment.responsibility)
+
+        ].filter(score => score > 0);
+
+        const average = scores.length
+            ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+            : null;
+
+        document.getElementById("assessmentScore").textContent = average !== null ? average : "Belum dinilai";
+
+    }
+
+    // ==========================================
+    // MODAL
+    // ==========================================
+
+    function closeModal(id) {
+
+        document.getElementById(id).classList.remove("active");
+
+    }
+
+    document.querySelectorAll(".modal").forEach(modal => {
+
+        modal.addEventListener("click", function(e) {
+
+            if (e.target === modal) {
+                modal.classList.remove("active");
+            }
+
+        });
+
+    });
+
+    // ==========================================
+    // THEME
+    // ==========================================
+
+    const savedTheme = localStorage.getItem("interntrack_theme");
+
+    if (savedTheme === "dark") {
+
+        document.body.classList.add("dark");
+
+        document.getElementById("themeToggle").textContent = "☀️";
+
+    }
+
+    document.getElementById("themeToggle").addEventListener("click", function() {
+
+        document.body.classList.toggle("dark");
+
+        const isDark = document.body.classList.contains("dark");
+
+        localStorage.setItem("interntrack_theme", isDark ? "dark" : "light");
+
+        this.textContent = isDark ? "☀️" : "🌙";
+
+    });
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
+
+    function formatDate(dateString) {
+
+        if (!dateString) {
+            return "-";
+        }
+
+        const date = new Date(dateString + "T00:00:00");
+
+        return date.toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        });
+
+    }
+
+    function getStatusBadge(status) {
+
+        let className = "blue-bg";
+
+        if (status === "Selesai") {
+            className = "green-bg";
+        }
+
+        if (status === "Sedang Dikerjakan") {
+            className = "orange-bg";
+        }
+
+        if (status === "Belum Dikerjakan") {
+            className = "red-bg";
+        }
+
+        return `<span class="badge ${className}">${status}</span>`;
+
+    }
+
+    function getPriorityBadge(priority) {
+
+        let className = "blue-bg";
+
+        if (priority === "Tinggi") {
+            className = "red-bg";
+        }
+
+        if (priority === "Sedang") {
+            className = "orange-bg";
+        }
+
+        if (priority === "Rendah") {
+            className = "green-bg";
+        }
+
+        return `<span class="badge ${className}">${priority}</span>`;
+
+    }
+
+    function escapeHTML(text) {
+
+        return String(text || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+    function showToast(message) {
+
+        const toast = document.getElementById("toast");
+
+        toast.textContent = message;
+
+        toast.classList.add("show");
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 2500);
+
+    }
+
+    // ==========================================
+    // INITIALIZE
+    // ==========================================
+
+    renderProfile();
+
+    renderAssessment();
+
+    renderDashboard();
+
+
+/* FITUR ABSENSI DAN NILAI OTOMATIS */
+let attendance = JSON.parse(localStorage.getItem("interntrack_attendance") || "[]");
+let attendanceStream = null, attendancePhoto = "", attendanceLocation = null;
+const originalSaveData = saveData;
+saveData = function(){ originalSaveData(); localStorage.setItem("interntrack_attendance",JSON.stringify(attendance)); localStorage.setItem("interntrack_workingDays",document.getElementById("workingDays")?.value||20); };
+function attendanceScore(){const days=Number(localStorage.getItem("interntrack_workingDays")||20), start=new Date();start.setMonth(start.getMonth()-2);start.setDate(1);const n=attendance.filter(a=>a.status==="Hadir"&&new Date(a.date)>=start).length;return Math.min(100,Math.round(n/(days*3)*100));}
+function taskAutoScore(t){if(!t.submittedAt)return t.status==="Selesai"?100:0;const late=Math.max(0,(new Date(t.submittedAt)-new Date(t.deadline+"T23:59:59"))/60000);return late<=0?100:late<=60?95:late<=120?90:late<=180?80:70;}
+function taskScore(){const a=tasks.filter(t=>t.status==="Selesai").map(taskAutoScore);return a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0;}
+function overallScore(){return Math.round((attendanceScore()+taskScore())/2);}
+function openAttendanceModal(){document.getElementById("attendanceModal").classList.add("active");attendancePhoto="";startAttendanceCamera();getAttendanceLocation();}
+async function startAttendanceCamera(){try{attendanceStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});document.getElementById("attendanceVideo").srcObject=attendanceStream;}catch(e){showToast("Kamera gagal dibuka. Gunakan HTTPS/localhost dan izinkan kamera.");}}
+function stopAttendanceCamera(){if(attendanceStream){attendanceStream.getTracks().forEach(t=>t.stop());attendanceStream=null;}}
+function closeAttendanceModal(){stopAttendanceCamera();document.getElementById("attendanceModal").classList.remove("active");}
+function captureAttendancePhoto(){const v=document.getElementById("attendanceVideo"),c=document.getElementById("attendanceCanvas");if(!v.videoWidth){showToast("Kamera belum siap.");return;}c.width=v.videoWidth;c.height=v.videoHeight;c.getContext("2d").drawImage(v,0,0);attendancePhoto=c.toDataURL("image/jpeg",.65);document.getElementById("attendancePreview").innerHTML='<img src="'+attendancePhoto+'" style="width:100%;margin-top:10px;border-radius:10px">';}
+function getAttendanceLocation(){if(navigator.geolocation)navigator.geolocation.getCurrentPosition(p=>{attendanceLocation={lat:p.coords.latitude,lon:p.coords.longitude};document.getElementById("locationStatus").textContent="Lokasi berhasil dicatat.";},()=>document.getElementById("locationStatus").textContent="Lokasi tidak diizinkan.");}
+function saveAttendance(){const status=document.getElementById("attendanceStatus").value;if(status==="Hadir"&&!attendancePhoto){showToast("Ambil foto terlebih dahulu.");return;}const n=new Date();attendance.push({id:Date.now(),date:n.toISOString().slice(0,10),time:n.toLocaleTimeString("id-ID"),status,photo:attendancePhoto,location:attendanceLocation,note:document.getElementById("attendanceNote").value});saveData();closeAttendanceModal();renderAttendance();renderDashboard();renderAssessment();showToast("Absensi berhasil disimpan.");}
+function renderAttendance(){if(!document.getElementById("attendanceTable"))return;document.getElementById("workingDays").value=localStorage.getItem("interntrack_workingDays")||20;["Hadir","Izin","Sakit","Tanpa Keterangan"].forEach((x,i)=>document.getElementById(["attPresent","attPermit","attSick","attAbsent"][i]).textContent=attendance.filter(a=>a.status===x).length);document.getElementById("attendanceTable").innerHTML=attendance.slice().reverse().map(a=>`<tr><td>${formatDate(a.date)}</td><td>${a.time}</td><td>${a.status}</td><td>${a.location?`<a target="_blank" href="https://maps.google.com/?q=${a.location.lat},${a.location.lon}">Lihat</a>`:"-"}</td><td>${a.photo?`<img src="${a.photo}" style="width:50px;height:40px;object-fit:cover;border-radius:5px">`:"-"}</td><td><button class="small-btn" onclick="deleteAttendance(${a.id})">🗑️</button></td></tr>`).join("")||'<tr><td colspan="6"><div class="empty">Belum ada absensi.</div></td></tr>';document.getElementById("attendanceScore").textContent=attendanceScore();}
+function deleteAttendance(id){attendance=attendance.filter(a=>a.id!==id);saveData();renderAttendance();renderDashboard();renderAssessment();}
+const oldShowPage=showPage;showPage=function(id){oldShowPage(id);if(id==="attendance")renderAttendance();if(id==="assessment")renderAssessment();};
+const oldRenderDashboard=renderDashboard;renderDashboard=function(){oldRenderDashboard();document.getElementById("attendanceScore").textContent=attendanceScore();};
+const oldRenderAssessment=renderAssessment;renderAssessment=function(){oldRenderAssessment();document.getElementById("scoreDiscipline").textContent=attendanceScore();document.getElementById("scoreTeamwork").textContent=taskScore();document.getElementById("scoreResponsibility").textContent=overallScore();document.getElementById("assessmentScore").textContent=overallScore();};
+document.getElementById("workingDays").addEventListener("change",saveData);
+</script>
+
+</body>
+</html>
